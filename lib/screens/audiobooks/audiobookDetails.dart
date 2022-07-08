@@ -3,23 +3,33 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:rating_dialog/rating_dialog.dart';
-import 'package:read_or_listen/screens/books/homeBooks.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:read_or_listen/screens/audio/audio_file.dart';
 import 'package:read_or_listen/screens/home/homeClient.dart';
-import 'package:read_or_listen/services/FirestoreFavoritosBooks.dart';
-import 'package:read_or_listen/services/FirestoreLerTardeBooks.dart';
-import 'package:read_or_listen/services/firestoreReviewsBook.dart';
-import 'package:read_or_listen/screens/pdf/pdf.dart';
+import 'package:read_or_listen/services/FirestoreFavoritosAudiobooks.dart';
+import 'package:read_or_listen/services/FirestoreLerTardeAudiobooks.dart';
+import 'package:read_or_listen/services/firestoreReviewsAudio.dart';
 
+class AudiobookDetailsPage extends StatefulWidget {
 
-class BookDetailsPage extends StatefulWidget {
-  final String livroId;
-  const BookDetailsPage(this.livroId, { Key key}) : super(key: key);
+  final String audiobookId;
+
+  const AudiobookDetailsPage(this.audiobookId, { Key key}) : super(key: key);
 
   @override
-  State<BookDetailsPage> createState() => _BookDetailsPageState();
+  State<AudiobookDetailsPage> createState() => _AudiobookDetailsPageState();
 }
 
-class _BookDetailsPageState extends State<BookDetailsPage> {
+class _AudiobookDetailsPageState extends State<AudiobookDetailsPage> {
+  AudioPlayer advancedPlayer;
+
+  @override
+  void initState(){
+    super.initState();
+    advancedPlayer = AudioPlayer();
+  }
+
+
   String uid = FirebaseAuth.instance.currentUser.uid;
 
   //Apagar Review
@@ -43,7 +53,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
               onPressed: () {
                 FirestoreReviewDelete(idReview);
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (BuildContext context) => BookDetailsPage(widget.livroId)));
+                    builder: (BuildContext context) => AudiobookDetailsPage(widget.audiobookId)));
               },
             ),
             TextButton(
@@ -66,8 +76,9 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
           elevation: 1,
           leading: IconButton(
             onPressed: () {
+              advancedPlayer.stop();
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => HomePageClient()));
+                  builder: (BuildContext context) => const HomePageClient()));
             },
             icon: const Icon(Icons.arrow_back_ios,
               color: Colors.white,
@@ -77,17 +88,15 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
         ),
         body: SingleChildScrollView(
           child: FutureBuilder<DocumentSnapshot>(
-            future: FirebaseFirestore.instance.collection('Livros').doc(widget.livroId).get(),
+            future: FirebaseFirestore.instance.collection('Audiobooks').doc(widget.audiobookId).get(),
             builder:
                 (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
               if (snapshot.hasError) {
                 return const Text("Algo correu mal!");
               }
-
               if (snapshot.hasData && !snapshot.data.exists) {
-                return const Center(child:Text("Sem nenhum Livro"));
+                return const Center(child:Text("Sem nenhum Audiobook"));
               }
-
               if (snapshot.connectionState == ConnectionState.done) {
                 Map<String, dynamic> data = snapshot.data.data();
 
@@ -108,41 +117,42 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                         children: <Widget> [
                           //Botao favorito
                           FutureBuilder<DocumentSnapshot>(
-                            future: FirebaseFirestore.instance.collection('FavoritosLivros').doc(widget.livroId+uid).get(),
+                            future: FirebaseFirestore.instance.collection('FavoritosAudio').doc(widget.audiobookId+uid).get(),
                             builder:
                                 (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshots) {
                               if (snapshots.hasError) {
                                 return const Text("Algo correu mal!");
                               }
-
                               if (snapshots.hasData && !snapshots.data.exists) {
                                 return IconButton(
                                   icon: const Icon(Icons.favorite_outline),
                                   tooltip: 'Favoritos',
                                   onPressed: () {
                                     setState(() {
-                                      String id_livro = snapshot.data.id;
+                                      String id_audiobook = snapshot.data.id;
                                       String capa = data['Capa'];
                                       String titulo = data['Titulo'];
                                       String autor = data['Autor'];
-                                      String id_favorito = widget.livroId+uid;
+                                      String id_favorito = widget.audiobookId+uid;
 
-                                      FirestoreCreateFavoritosBooks(id_livro, capa, titulo, autor, id_favorito);
-                                      print("Favoritos Livro");
+                                      FirestoreCreateFavoritosAudiobooks(id_audiobook, capa, titulo, autor, id_favorito);
+                                      print("favoritos");
                                     });
+
                                   },);
                               }
 
-                              if (snapshots.connectionState == ConnectionState.done) {
+                              if (snapshot.connectionState == ConnectionState.done) {
+
                                 return IconButton(
                                   icon: const Icon(Icons.favorite_outlined),
                                   color: Colors.black,
                                   tooltip: 'Favoritos',
                                   onPressed: () {
                                     setState(() {
-                                      String id_favorito = widget.livroId+uid;
+                                      String id_favorito = widget.audiobookId+uid;
 
-                                      FirestoreFavoritoDeleteBook(id_favorito);
+                                      FirestoreFavoritoDeleteAudiobook(id_favorito);
                                       print("favoritos");
                                     });
                                   },);
@@ -153,7 +163,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
 
                           //Botao ler mais tarde
                           FutureBuilder<DocumentSnapshot>(
-                            future: FirebaseFirestore.instance.collection('LerTardeLivros').doc(widget.livroId+uid).get(),
+                            future: FirebaseFirestore.instance.collection('LerTardeAudio').doc(widget.audiobookId+uid).get(),
                             builder:
                                 (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshotx) {
                               if (snapshotx.hasError) {
@@ -161,25 +171,24 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                               }
 
                               if (snapshotx.hasData && !snapshotx.data.exists) {
-                                return
-                                  IconButton(
+                                return IconButton(
                                   icon: const Icon(Icons.add),
                                   tooltip: 'LerTarde',
                                   onPressed: () {
                                     setState(() {
-                                      String id_livro = snapshot.data.id;
+                                      String id_audiobook = snapshot.data.id;
                                       String capa = data['Capa'];
                                       String titulo = data['Titulo'];
                                       String autor = data['Autor'];
-                                      String id_lerTarde = widget.livroId+uid;
+                                      String id_lerTarde = widget.audiobookId+uid;
 
-                                      FirestoreCreateLerTardeBooks(id_livro, capa, titulo, autor, id_lerTarde);
-                                      print("lerTarde");
+                                      FirestoreCreateLerTardeAudiobooks(id_audiobook, capa, titulo, autor, id_lerTarde);
                                     });
+
                                   },);
                               }
 
-                              if (snapshotx.connectionState == ConnectionState.done) {
+                              if (snapshot.connectionState == ConnectionState.done) {
 
                                 return IconButton(
                                   icon: const Icon(Icons.close),
@@ -187,9 +196,10 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                   tooltip: 'Ler mais tarde',
                                   onPressed: () {
                                     setState(() {
-                                      String id_lerTarde = widget.livroId+uid;
+                                      String id_lerTarde = widget.audiobookId+uid;
 
-                                      FirestoreLerTardeDeleteBook(id_lerTarde);
+                                      FirestoreLerTardeDeleteAudiobook(id_lerTarde);
+                                      print("ler mais tarde");
                                     });
                                   },);
                               }
@@ -198,82 +208,35 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                           ),
                         ]
                     ),
-                    Padding(padding: EdgeInsets.only(top: 10)),
-                    SizedBox(
-                        height:50,
-                        width:200,
-                        child:ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                primary: Colors.black87, //background color of button
-                                side: BorderSide(width:3, color: Colors.black87), //border width and color
-                                elevation: 3, //elevation of button
-                                shape: RoundedRectangleBorder( //to set border radius to button
-                                    borderRadius: BorderRadius.circular(30)
-                                ),
-                            ),
-                            onPressed: (){
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (BuildContext context) => PdfViewer(widget.livroId, data['Titulo'])));
-                            },
-                            child: Text("Clique aqui para ler")
-                        )
-                    ),
-                    Padding(padding: EdgeInsets.only(top: 30)),
+                    Padding(padding: EdgeInsets.only(top: 30),
+                        child: AudioFile(advancedPlayer: advancedPlayer, audiobookId: widget.audiobookId, audiopath: data['Audio'])),
+                    Padding(padding: EdgeInsets.only(top: 40)),
                     ListView(
                         physics: new NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         children: <Widget> [
-                          //Resumo do livro
                           ExpansionTile(title: const Text('Resumo'),
                             backgroundColor: Colors.blueGrey.shade50,
                             iconColor: Colors.grey,
                             textColor: Colors.black,
                             children: [
                               const Padding(
-                                  padding: EdgeInsets.all(0)),
-                              Padding(padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                                child: Text(data['Resumo'], style: const TextStyle(/*fontSize: 12,*/ color: Colors.grey), textAlign:TextAlign.justify)),
+                                  padding: EdgeInsets.all(1)),
+                                Padding(padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
+                                  child: Text(data['Resumo'], style: const TextStyle(/*fontSize: 12,*/ color: Colors.grey), textAlign:TextAlign.justify)),
                             ],
                           ),
-
-                          //Caracteristicas do livro
                           ExpansionTile(title: const Text('Características'),
                             backgroundColor: Colors.blueGrey.shade50,
                             iconColor: Colors.grey,
                             textColor: Colors.black,
                             children: [
                               const Padding(
-                                  padding: EdgeInsets.all(0)),
+                                  padding: EdgeInsets.all(1)),
                               Padding(padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
                                   child: Text('Género:  ' + data['Genero'], style: const TextStyle(/*fontSize: 12,*/ color: Colors.grey), textAlign:TextAlign.justify)),
                               Padding(padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                                  child: Text('Nº de páginas:  ' + data['numpaginas'], style: const TextStyle(/*fontSize: 12,*/ color: Colors.grey), textAlign:TextAlign.justify)),
-                              Padding(padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                                  child: Text('Editor:  ' + data['Editor'], style: const TextStyle(/*fontSize: 12,*/ color: Colors.grey), textAlign:TextAlign.justify)),
-                              Padding(padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                                  child: Text('Data de lançamento:  ' + data['datalancamento'], style: const TextStyle(/*fontSize: 12,*/ color: Colors.grey), textAlign:TextAlign.justify)),
-                            ],
-                          ),
-
-                          //Disponibilidade nas bilbiotecas parceiras
-                          ExpansionTile(title: const Text('Disponibilidade nas bibliotecas parceiras'),
-                            backgroundColor: Colors.blueGrey.shade50,
-                            iconColor: Colors.grey,
-                            textColor: Colors.black,
-                            children: const [
-                              Padding(
-                                  padding: EdgeInsets.fromLTRB(20, 0, 20, 20)),
-                                    ExpansionTile(title: const Text('Bibioteca de Miranda do Corvo'),
-                                    iconColor: Colors.grey,
-                                    textColor: Colors.black,),
-                              ExpansionTile(title: const Text('Bibioteca de Condeixa'),
-                                iconColor: Colors.grey,
-                                textColor: Colors.black,
-                              ),
-
-                              ExpansionTile(title: const Text('Bibioteca de Coimbra'),
-                                iconColor: Colors.grey,
-                                textColor: Colors.black,)
+                                  child: Text('Duração:  ' + data['Tempo'], style: const TextStyle(/*fontSize: 12,*/ color: Colors.grey), textAlign:TextAlign.justify)),
                             ],
                           ),
                           Container(
@@ -287,7 +250,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                               //crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 FutureBuilder<DocumentSnapshot>(
-                                  future: FirebaseFirestore.instance.collection('Reviews').doc(uid+widget.livroId).get(),
+                                  future: FirebaseFirestore.instance.collection('Reviews').doc(uid+widget.audiobookId).get(),
                                   builder:
                                       (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshotb) {
                                     if (snapshotb.hasError) {
@@ -316,10 +279,9 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                               ],
                             ),
                           ),
-
                           //My review
                           FutureBuilder<DocumentSnapshot>(
-                            future: FirebaseFirestore.instance.collection('Reviews').doc(uid+widget.livroId).get(),
+                            future: FirebaseFirestore.instance.collection('Reviews').doc(uid+widget.audiobookId).get(),
                             builder:
                                 (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshotz) {
                               if (snapshotz.hasError) {
@@ -385,7 +347,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                           size: 35),
                                         onPressed: () {
                                           //Apagar review
-                                          _showDialog(uid+widget.livroId);
+                                          _showDialog(uid+widget.audiobookId);
                                         },
                                       ),
                                     ),
@@ -395,18 +357,18 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                               return Center(child: Text("A carregar..."));
                             },
                           ),
-
                           //Todas as Reviews
                           Container(
-                            padding: EdgeInsets.fromLTRB(20, 20, 20, 30),
+                            padding: EdgeInsets.all(20),
                             child: Text('Todas as Reviews', style: TextStyle(fontSize: 18, color: Colors.black),),
                           ),
                           Container(
                             child: StreamBuilder<QuerySnapshot>(
-                              stream: FirebaseFirestore.instance.collection('Reviews').where('Id_livro',isEqualTo: widget.livroId).snapshots(),
+                              stream: FirebaseFirestore.instance.collection('Reviews').where('Id_audiobook',isEqualTo: widget.audiobookId).snapshots(),
                               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshotr) {
                                 if (!snapshotr.hasData) return const Center(child: Text('A carregar reviews...'));
                                 final document = snapshotr.requireData;
+
                                 return ListView.builder(
                                     shrinkWrap: true,
                                     itemCount: document.size,
@@ -414,6 +376,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                       return SafeArea(
                                         child:  Padding(
                                           padding: const EdgeInsets.all(4.0),
+                                          // color: Colors.green,
                                           child: Row(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             mainAxisAlignment: MainAxisAlignment.start,
@@ -494,13 +457,11 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
           ),
         ),
       );
-
   }
 
   //Caixa para adicionar review
   void _showRatingAppDialog() {
     final _ratingDialog = RatingDialog(
-
       title: const Text(''),
       message: Text('Deixe a sua opinião...'),
       image: Image.asset("assets/images/logo.png",height: 150,),
@@ -508,12 +469,11 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
       commentHint: 'Deixe o seu comentario...',
       onCancelled: () => print('Cancelado'),
       onSubmitted: (response) {
-
         //criar review
-        CreateReview(response.comment,response.rating.toDouble(),widget.livroId);
+        CreateReview(response.comment,response.rating.toDouble(),widget.audiobookId);
 
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) => BookDetailsPage(widget.livroId)));
+            builder: (BuildContext context) => AudiobookDetailsPage(widget.audiobookId)));
       },
     );
 
@@ -524,4 +484,3 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
     );
   }
 }
-

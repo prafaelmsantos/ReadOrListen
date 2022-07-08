@@ -35,6 +35,15 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
 
+  #Ver pdf
+  syncfusion_flutter_pdfviewer: ^19.1.69-beta
+
+  #FilePicker
+  file_picker: ^4.6.1
+
+  #Audio
+  audioplayers: ^0.20.1
+
   # Conexão à base de dados Firebase.
   firebase_core: ^1.14.0
   firebase_auth: ^3.3.18

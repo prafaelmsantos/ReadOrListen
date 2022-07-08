@@ -12,43 +12,27 @@ class UPassword extends StatefulWidget {
 }
 
 class _UPasswordState extends State<UPassword> {
-
   String _password='';
   TextEditingController passwordText = TextEditingController();
-
 
   String uid = FirebaseAuth.instance.currentUser.uid;
   String uname = FirebaseAuth.instance.currentUser.displayName;
   String uemail = FirebaseAuth.instance.currentUser.email;
 
-
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   CollectionReference utilizadores = FirebaseFirestore.instance.collection('Utilizadores');
 
 
-
   Future<void> _updatePassword() async {
-
-
     final formState = _formKey.currentState;
-
     if(formState.validate()){
-
       formState.save();
-
       User user = FirebaseAuth.instance.currentUser;
-
-      //var user = firebase.auth().currentUser;
       user.updatePassword(_password);
-
-
     }
-
   }
   bool showPassword = true;
   bool showConfirmPassword = true;
-
 
   Future<void> _showDialog() async {
     return showDialog<void>(
@@ -91,25 +75,23 @@ class _UPasswordState extends State<UPassword> {
     return Scaffold(
       appBar: AppBar(
         elevation: 1,
+        backgroundColor: Colors.black,
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
           },
           icon: Icon(Icons.arrow_back_ios,
             size: 20,
-            color: Colors.black,
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
         title: Text(
-          "Alterar Password", style: TextStyle(color: Colors.black, fontSize: 24),),
-
+          "Alterar Password", style: TextStyle(color: Colors.white, fontSize: 24),),
       ),
       body: Scaffold(
-
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.white,
-
         body: SingleChildScrollView(
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 40),
@@ -118,38 +100,27 @@ class _UPasswordState extends State<UPassword> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-
                   children: <Widget>[
-
                     Form(
                       key: _formKey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-
                         children: <Widget>[
-
-
                           Text(
                             'Nova password',
-
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w400,
-                              color:Colors.black87,
-                            ),
-
+                              color:Colors.black87,),
                           ),
                           SizedBox(
                             height: 10,
                           ),
-
                           TextFormField(
                             obscureText: showPassword,
                             controller: passwordText,
-
                             validator: (input){
                               if(input.length<6){
                                 return 'A password deve ter no minimo 6 caracteres.';
@@ -167,35 +138,27 @@ class _UPasswordState extends State<UPassword> {
                                   borderSide: BorderSide(
                                       color: Colors.grey[400]
                                   ),
-
                                 ),
                                 border: OutlineInputBorder(
                                     borderSide: BorderSide(color: Colors.grey[400])
                                 )
                             ),
-
                           ),
                           SizedBox(
                             height: 10,
                           ),
                           Text(
                             'Repetir password',
-
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w400,
-                              color:Colors.black87,
-                            ),
-
+                              color:Colors.black87,),
                           ),
                           SizedBox(
                             height: 10,
                           ),
-
                           TextFormField(
-
                             obscureText: showConfirmPassword,
-
                             validator: (input){
                               if(input.length<6){
                                 return 'A password deve ter no minimo 6 caracteres.';
@@ -216,68 +179,45 @@ class _UPasswordState extends State<UPassword> {
                                   borderSide: BorderSide(
                                       color: Colors.grey[400]
                                   ),
-
                                 ),
                                 border: OutlineInputBorder(
                                     borderSide: BorderSide(color: Colors.grey[400])
                                 )
                             ),
-
                           ),
-
-
-
                         ],
                       ),
                     ),
-
-
                   ],
                 ),
                 Container(
                   decoration:
                   BoxDecoration(
                     borderRadius: BorderRadius.circular(50),
-
                   ),
                   child: MaterialButton(
                     minWidth: double.infinity,
                     height: 60,
                     onPressed: () {
                     _showDialog();
-
-
                     },
-                    color: Color(0xff0095FF),
+                    color: Colors.black,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50),
-
                     ),
                     child: Text(
                       "Editar password", style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 18,
-                      color: Colors.white,
-
+                      color: Colors.white,),
                     ),
-                    ),
-
                   ),
-
-
-
                 ),
-
               ],
-
             ),
-
-
           ),
-
         ),
-
       ),
     );
   }

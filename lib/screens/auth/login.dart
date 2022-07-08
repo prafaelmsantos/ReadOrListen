@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:read_or_listen/screens/auth/passwordReset.dart';
 import 'package:read_or_listen/screens/auth/signup.dart';
-import 'package:read_or_listen/screens/home/home.dart';
+import 'package:read_or_listen/screens/home/homeAdmin.dart';
 import 'package:read_or_listen/screens/home/homeClient.dart';
 import 'package:read_or_listen/services/firestoreUsers.dart';
 
@@ -19,62 +19,47 @@ class _LoginPageState extends State<LoginPage> {
   String _email ='';
   String _password='';
 
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
   CollectionReference utilizadores = FirebaseFirestore.instance.collection('Utilizadores');
-
 
   Future<void> _loginuser() async {
     final formState = _formKey.currentState;
 
     if(formState.validate()){
-
       formState.save();
-
       try {
-
-        //await Firebase.initializeApp();
-
         UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password);
         print("User: $userCredential");
 
-
-        //Firestore online
+        //Firestore utilizador online
         OnlineUser();
 
-        //Firestore Ultimo Acesso
+        //Firestore Ultimo Acesso utilizador
         FirestoreUpdateLastLogin();
 
         FirebaseAuth auth = FirebaseAuth.instance;
-
         String _uid = auth.currentUser.uid;
         FirebaseFirestore.instance.collection('Utilizadores').doc(_uid).get().then((data) {
-
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('O login foi iniciado com sucesso')));
           if(data['Funcao'] == 'Admin'){
             Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) => HomePage()));
+                builder: (BuildContext context) => AdminPage()));
             print('Home Page');
           }else{
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (BuildContext context) => const HomePageClient()));
           }
-          // use ds as a snapshot
         });
-
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
           _showDialog('Nenhum utilizador encontrado para esse e-mail.');
         } else if (e.code == 'wrong-password') {
           _showDialog('Password incorreta para este utilizador');
-
         }
       }
-
     }
-
   }
-
 
   Future<void> _showDialog(String erro) async {
     return showDialog<void>(
@@ -103,7 +88,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
@@ -120,11 +104,10 @@ class _LoginPageState extends State<LoginPage> {
           icon: const Icon(Icons.arrow_back_ios,
             size: 20,
             color: Colors.black,),
-
-
         ),
       ),
-      body: SizedBox(
+      body:SingleChildScrollView(
+        child:SizedBox(
         height: MediaQuery.of(context).size.height,
         width: double.infinity,
         child: Column(
@@ -149,30 +132,21 @@ class _LoginPageState extends State<LoginPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-
                     children: <Widget>[
-
                       Form(
                         key: _formKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-
                           children: <Widget>[
-
                             const Text(
                               'Email',
-
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w400,
-                                color:Colors.black87,
-                              ),
-
+                                color:Colors.black87,),
                             ),
                             const SizedBox(
-                              height: 10,
-                            ),
-
+                              height: 10,),
                             TextFormField(
                               keyboardType: TextInputType.emailAddress,
                               validator: (input){
@@ -188,28 +162,21 @@ class _LoginPageState extends State<LoginPage> {
                                     borderSide: BorderSide(
                                         color: Colors.grey[400]
                                     ),
-
                                   ),
                                   border: OutlineInputBorder(
                                       borderSide: BorderSide(color: Colors.grey[400])
                                   )
                               ),
-
                             ),
                             const SizedBox(height: 20,),
-
                             const Text(
                               'Password',
                               style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w400,
-                                  color:Colors.black87
-                              ),
-
+                                  color:Colors.black87),
                             ),
-
                             const SizedBox(height: 10,),
-
                             TextFormField(
                               obscureText: hidePassword,
                               validator: (input){
@@ -219,7 +186,6 @@ class _LoginPageState extends State<LoginPage> {
                               } ,
                               onSaved: (input) {
                                 _password =input;
-
                                 },
                               decoration: InputDecoration(
                                 suffixIcon: IconButton(
@@ -232,18 +198,15 @@ class _LoginPageState extends State<LoginPage> {
                                     borderSide: BorderSide(
                                         color: Colors.grey[400]
                                     ),
-
                                   ),
                                   border: OutlineInputBorder(
                                       borderSide: BorderSide(color: Colors.grey[400])
                                   )
                               ),
-
                             ),
                           ],
                         ),
                       ),
-
                       const SizedBox(height: 10,),
                       MaterialButton(
                         onPressed: () {
@@ -256,13 +219,9 @@ class _LoginPageState extends State<LoginPage> {
                           "Esqueceu-se da palavra passe?", style: TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 15,
-                          color: Colors.black,
-
-
-                        ),
+                          color: Colors.black,),
                         ),
                       ),
-
                     ],
                   ),
                 ),
@@ -277,37 +236,27 @@ class _LoginPageState extends State<LoginPage> {
                           left: BorderSide(color: Colors.black),
                           right: BorderSide(color: Colors.black),
                         ),
-
-
                     ),
                     child: MaterialButton(
                       minWidth: double.infinity,
                       height: 60,
                       onPressed: () {
-
                         _loginuser();
-
-                        //Navigator.of(context).pushReplacementNamed('/home');
                       },
                       color: Colors.red[900],
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50),
-
                       ),
                       child: const Text(
                         "Iniciar sessão", style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 18,
-                        color: Colors.white,
-
+                        color: Colors.white,),
                       ),
-                      ),
-
                     ),
                   ),
                 ),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -327,17 +276,13 @@ class _LoginPageState extends State<LoginPage> {
                             ' Crie uma!', style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 16,
-                            color: Colors.black,
+                            color: Colors.black,),
                           ),
-                          ),
-
                         ],
                       )
                     ),
                   ],
                 ),
-
-
                 Container(
                   padding: const EdgeInsets.only(top: 100),
                   height: 200,
@@ -346,15 +291,14 @@ class _LoginPageState extends State<LoginPage> {
                         image: AssetImage("assets/images/background.png"),
                         fit: BoxFit.fitHeight
                     ),
-
                   ),
                 )
-
               ],
             ))
           ],
         ),
       ),
+    ),
     );
   }
 }

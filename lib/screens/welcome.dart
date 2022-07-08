@@ -2,6 +2,7 @@ import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
 import 'package:read_or_listen/screens/auth/signup.dart';
 import 'package:read_or_listen/screens/auth/login.dart';
+import 'package:read_or_listen/screens/home/homeClient.dart';
 
 
 class Welcome extends StatefulWidget {
@@ -13,41 +14,33 @@ class Welcome extends StatefulWidget {
 
 class _WelcomeState extends State<Welcome> {
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Container(
-
           width: double.infinity,
           height: MediaQuery.of(context).size.height,
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-
               const SizedBox(
                 height: 150,
               ),
-
-
               Container(
-                height: MediaQuery.of(context).size.height / 3,
-                decoration: const BoxDecoration(
+                height: 200,
+                decoration: BoxDecoration(
                     image: DecorationImage(
                         image: AssetImage("assets/images/logo.png")
                     )
                 ),
               ),
-
               const SizedBox(
                 height: 50,
               ),
-
-
               Column(
                 children: <Widget>[
                   // the login button
@@ -56,7 +49,6 @@ class _WelcomeState extends State<Welcome> {
                     height: 60,
                     onPressed: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
-
                     },
                     // defining the shape
                     shape: RoundedRectangleBorder(
@@ -80,7 +72,6 @@ class _WelcomeState extends State<Welcome> {
                     height: 60,
                     onPressed: (){
                       Navigator.push(context, MaterialPageRoute(builder: (context)=> const SignupPage()));
-
                     },
                     color: Colors.red[900],
                     shape: RoundedRectangleBorder(
@@ -96,25 +87,19 @@ class _WelcomeState extends State<Welcome> {
                     ),
                   ),
                 DoubleBackToCloseApp(
-                        snackBar: const SnackBar(
-                          content: Text('Pressione novamente para sair!'),
-                        ),
-                        child: Center(
-                          child: MaterialButton(
-
-                            onPressed:(){
-
-                              WidgetsBinding.instance.handlePopRoute;
-
-                          }
-                          ),
-                        ),
-                      ),
-
+                  snackBar: const SnackBar(
+                    content: Text('Pressione novamente para sair'),
+                  ),
+                  child: Center(
+                    child: MaterialButton(
+                      onPressed:(){
+                        WidgetsBinding.instance.handlePopRoute;
+                      }
+                    ),
+                  ),
+                ),
                 ],
               ),
-
-
             ],
           ),
         ),

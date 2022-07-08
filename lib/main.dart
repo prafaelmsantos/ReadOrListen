@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:read_or_listen/screens/auth/login.dart';
 import 'package:read_or_listen/screens/auth/signup.dart';
-import 'package:read_or_listen/screens/home/home.dart';
+import 'package:read_or_listen/screens/home/homeAdmin.dart';
 import 'package:read_or_listen/screens/home/homeClient.dart';
 import 'package:read_or_listen/screens/welcome.dart';
 
@@ -22,25 +22,19 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home:LandingPage(),
-
       debugShowCheckedModeBanner: false,
-
-      //initialRoute: '/login',
       routes: {
         '/login': (context) => LoginPage(),
-        '/home': (context) => HomePage(),
+        '/home': (context) => AdminPage(),
         '/sign': (context) => SignupPage(),
         '/welcome': (context) => Welcome(),
-
       },
     );
   }
 }
 
 class LandingPage extends StatelessWidget {
-
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
-
 
   @override
   Widget build(BuildContext context) {

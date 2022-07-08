@@ -15,9 +15,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-
   Future<void> _homeNavigation() async {
-
     try {
       FirebaseFirestore.instance
           .collection("Utilizadores")
@@ -38,25 +36,24 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         elevation: 1,
+        backgroundColor: Colors.black,
         leading: IconButton(
           onPressed: () {
             _homeNavigation();
           },
           icon: Icon(
             Icons.arrow_back_ios,
-            color: Colors.black,
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
         title: Text(
-          "Definições", style: TextStyle(color: Colors.black, fontSize: 24),),
+          "Definições", style: TextStyle(color: Colors.white, fontSize: 24),),
       ),
       body: Container(
 

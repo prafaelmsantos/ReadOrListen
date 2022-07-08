@@ -1,34 +1,34 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:read_or_listen/screens/books/allBooks.dart';
-import 'package:read_or_listen/screens/books/generosResultBook.dart';
-import 'package:read_or_listen/screens/books/bookDetails.dart';
-import 'package:read_or_listen/screens/metadiaria/metadiaria.dart';
+import 'package:read_or_listen/screens/audiobooks/allAudiobooks.dart';
+import 'package:read_or_listen/screens/audiobooks/generosResultAudio.dart';
+import 'package:read_or_listen/screens/audiobooks/audiobookDetails.dart';
 
 
-class HomeBooksPage extends StatefulWidget {
-  const HomeBooksPage({Key key}) : super(key: key);
+class HomeAudiobooksPage extends StatefulWidget {
+  const HomeAudiobooksPage({Key key}) : super(key: key);
 
   @override
-  State<HomeBooksPage> createState() => _HomeBooksPageState();
+  State<HomeAudiobooksPage> createState() => _HomeAudiobooksPageState();
 }
 
-class _HomeBooksPageState extends State<HomeBooksPage> {
+class _HomeAudiobooksPageState extends State<HomeAudiobooksPage> {
 
-  final List<String> generos = <String>['Terror', 'Ação', 'Comédia', 'Romance','Literário','Ficção Cientifica'];
+  final List<String> generos = <String>['Terror', 'Ação', 'Comédia', 'Romance','Novela','Poesia'];
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Column(
+        child:Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.fromLTRB(16.0, 32.0, 16.0, 4.0),
             child: Text(
-              ' Livros ',style: TextStyle(
+              ' Audiobooks ',style: TextStyle(
               fontSize: 35,
               fontWeight: FontWeight.w500,
               color: Colors.black,),
@@ -37,14 +37,15 @@ class _HomeBooksPageState extends State<HomeBooksPage> {
           Container(
             padding: const EdgeInsets.fromLTRB(16.0, 32.0, 16.0, 4.0),
             child: Text(
-                'Top Livros Mais Lidos',
+                'Top Audiobooks Mais Ouvidos',
                 style: TextStyle(fontSize: 25)),
           ),
             StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('Livros').orderBy('Downloads', descending: true).limit(5).snapshots(),
+              stream: FirebaseFirestore.instance.collection('Audiobooks').orderBy('Downloads', descending: true).limit(5).snapshots(),
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData) return const Center(child: Text('A carregar Livros...'));
+                if (!snapshot.hasData) return const Center(child: Text('A carregar Audiobooks...'));
                 final document = snapshot.requireData;
+
                 return ListView.builder(
                     physics: new NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
@@ -56,10 +57,11 @@ class _HomeBooksPageState extends State<HomeBooksPage> {
                           child: MaterialButton(
                             height: 80,
                             onPressed: () {
-                              String livroId = snapshot.data.docs[index].id;
+                              String audiobookId = snapshot.data.docs[index].id;
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (BuildContext context) => BookDetailsPage(livroId)));
+                                  builder: (BuildContext context) => AudiobookDetailsPage(audiobookId)));
                             },
+                            // color: Colors.green,
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -117,16 +119,17 @@ class _HomeBooksPageState extends State<HomeBooksPage> {
                 );
               },
             ),
+
           Column(
             children: [
               MaterialButton(
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) => const AllBooksPage()));
+                      builder: (BuildContext context) => const AllAudiobooksPage()));
                 },
                 child: Row(
                   children: const [
-                    Text('Ver mais livros ', style:
+                    Text('Ver mais aubiobooks ', style:
                     TextStyle(fontSize: 18, color: Colors.black),
                     ),
                     Icon(
@@ -151,12 +154,11 @@ class _HomeBooksPageState extends State<HomeBooksPage> {
               physics: new NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               children: [
-
                 //Terror
                 MaterialButton(
                   onPressed: () {
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) => const GenerosResultBookPage('Terror')));
+                        builder: (BuildContext context) => const GenerosResultAudioPage('Terror')));
                   },
                   child: Row(
                     children: const [
@@ -171,68 +173,11 @@ class _HomeBooksPageState extends State<HomeBooksPage> {
                   ),
                 ),
 
-                //Romance
+                //Acao
                 MaterialButton(
                   onPressed: () {
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) => const GenerosResultBookPage('Romance')));
-                  },
-                  child: Row(
-                    children: const [
-                      Text('Romance', style:
-                      TextStyle(fontSize: 16, color: Colors.black),
-                      ),
-                      Icon(
-                          Icons.arrow_forward_ios_sharp,
-                          color: Colors.black,
-                          size: 15),
-                    ],
-                  ),
-                ),
-
-                //Poesia
-                MaterialButton(
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) => const GenerosResultBookPage('Poesia')));
-                  },
-                  child: Row(
-                    children: const [
-                      Text('Poesia', style:
-                      TextStyle(fontSize: 16, color: Colors.black),
-                      ),
-                      Icon(
-                          Icons.arrow_forward_ios_sharp,
-                          color: Colors.black,
-                          size: 15),
-                    ],
-                  ),
-                ),
-
-                //Comedia
-                MaterialButton(
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) => const GenerosResultBookPage('Comédia')));
-                  },
-                  child: Row(
-                    children: const [
-                      Text('Comédia', style:
-                      TextStyle(fontSize: 16, color: Colors.black),
-                      ),
-                      Icon(
-                          Icons.arrow_forward_ios_sharp,
-                          color: Colors.black,
-                          size: 15),
-                    ],
-                  ),
-                ),
-
-                //Ação
-                MaterialButton(
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) => const GenerosResultBookPage('Ação')));
+                        builder: (BuildContext context) => const GenerosResultAudioPage('Romance')));
                   },
                   child: Row(
                     children: const [
@@ -247,15 +192,72 @@ class _HomeBooksPageState extends State<HomeBooksPage> {
                   ),
                 ),
 
-                //Autoajuda
+                //Romance
                 MaterialButton(
                   onPressed: () {
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) => const GenerosResultBookPage('Autoajuda')));
+                        builder: (BuildContext context) => const GenerosResultAudioPage('Romance')));
                   },
                   child: Row(
                     children: const [
-                      Text('Autoajuda', style:
+                      Text('Romance', style:
+                      TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                      Icon(
+                          Icons.arrow_forward_ios_sharp,
+                          color: Colors.black,
+                          size: 15),
+                    ],
+                  ),
+                ),
+
+                //Comedia
+                MaterialButton(
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (BuildContext context) => const GenerosResultAudioPage('Comédia')));
+                  },
+                  child: Row(
+                    children: const [
+                      Text('Comédia', style:
+                      TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                      Icon(
+                          Icons.arrow_forward_ios_sharp,
+                          color: Colors.black,
+                          size: 15),
+                    ],
+                  ),
+                ),
+
+                //Novela
+                MaterialButton(
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (BuildContext context) => const GenerosResultAudioPage('Novela')));
+                  },
+                  child: Row(
+                    children: const [
+                      Text('Novela', style:
+                      TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                      Icon(
+                          Icons.arrow_forward_ios_sharp,
+                          color: Colors.black,
+                          size: 15),
+                    ],
+                  ),
+                ),
+
+                //Poesia
+                MaterialButton(
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (BuildContext context) => const GenerosResultAudioPage('Poesia')));
+                  },
+                  child: Row(
+                    children: const [
+                      Text('Poesia', style:
                       TextStyle(fontSize: 16, color: Colors.black),
                       ),
                       Icon(
@@ -269,20 +271,6 @@ class _HomeBooksPageState extends State<HomeBooksPage> {
             ),
           ),
           const SizedBox(height: 5,),
-          const Text(
-            ' Meta Diária ',style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-            color: Colors.black,
-          ),
-          ),
-          const Text('Estabeleça uma meta diária para que se possa ver o seu progresso',
-            style: TextStyle(fontSize: 13, color: Colors.grey),
-          ),
-          Container(
-            height: 270.0,
-            child: MetaDiaria(),
-          ),
         ],
       ),
       ),

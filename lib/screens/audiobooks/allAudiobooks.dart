@@ -1,19 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:read_or_listen/screens/home/homeClient.dart';
-import 'package:read_or_listen/screens/books/bookDetails.dart';
+import 'package:read_or_listen/screens/audiobooks/audiobookDetails.dart';
 
-import 'homeBooks.dart';
-
-
-class AllBooksPage extends StatefulWidget {
-  const AllBooksPage({Key key}) : super(key: key);
+class AllAudiobooksPage extends StatefulWidget {
+  const AllAudiobooksPage({Key key}) : super(key: key);
 
   @override
-  State<AllBooksPage> createState() => _AllBooksPageState();
+  State<AllAudiobooksPage> createState() => _AllAudiobooksPageState();
 }
 
-class _AllBooksPageState extends State<AllBooksPage> {
+class _AllAudiobooksPageState extends State<AllAudiobooksPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,18 +28,18 @@ class _AllBooksPageState extends State<AllBooksPage> {
         ),
         centerTitle: true,
         title: const Text(
-          "Livros", style: TextStyle(color: Colors.white, fontSize: 28),),
+          "Audiobooks", style: TextStyle(color: Colors.white, fontSize: 28),),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           const SizedBox(height: 35,),
-          Flexible(
+          Container(
             child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('Livros').snapshots(),
+              stream: FirebaseFirestore.instance.collection('Audiobooks').snapshots(),
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData) return const Center(child: Text('A carregar Livros...'));
+                if (!snapshot.hasData) return const Center(child: Text('A carregar Audiobooks...'));
                 final document = snapshot.requireData;
                 return ListView.builder(
                     shrinkWrap: true,
@@ -52,11 +49,10 @@ class _AllBooksPageState extends State<AllBooksPage> {
                       child:  Padding(
                         padding: const EdgeInsets.all(0.0),
                         child: MaterialButton(
-                          height: 80,
                           onPressed: () {
                             String livroId = snapshot.data.docs[index].id;
                             Navigator.of(context).push(MaterialPageRoute(
-                                builder: (BuildContext context) => BookDetailsPage(livroId)));
+                                builder: (BuildContext context) => AudiobookDetailsPage(livroId)));
                           },
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,7 +103,7 @@ class _AllBooksPageState extends State<AllBooksPage> {
                         ),
                       ),
                     );
-                });
+                  });
               },
             ),
           ),

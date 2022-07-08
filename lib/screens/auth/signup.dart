@@ -49,13 +49,19 @@ class _SignupPageState extends State<SignupPage> {
         //Firestore ultimo acesso
         FirestoreUpdateLastLogin();
 
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('O registo foi criado com sucesso')));
         //Definir rota
         Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) => const HomePageClient()));
 
       } on FirebaseAuthException catch(e) {
         print("Error: $e");
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Erro!')));
       } catch (e){
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('erro')));
         print("Error: $e");
       }
     }
@@ -82,8 +88,6 @@ class _SignupPageState extends State<SignupPage> {
           icon: const Icon(Icons.arrow_back_ios,
             size: 20,
             color: Colors.black,),
-
-
         ),
       ),
       body: SingleChildScrollView(
@@ -100,43 +104,33 @@ class _SignupPageState extends State<SignupPage> {
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
-
                     ),),
                   const SizedBox(height: 20,),
                   Text("Crie uma conta gratuita",
                     style: TextStyle(
                         fontSize: 15,
                         color:Colors.grey[700]),)
-
-
                 ],
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-
                 children: <Widget>[
-
                   Form(
                     key: _formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-
                       children: <Widget>[
-
                         const Text(
                           'Nome ( Primeiro e ultimo)',
-
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w400,
                             color:Colors.black87,
                           ),
-
                         ),
                         const SizedBox(
                           height: 10,
                         ),
-
                         TextFormField(
                           keyboardType: TextInputType.emailAddress,
                           validator: (input){
@@ -152,30 +146,24 @@ class _SignupPageState extends State<SignupPage> {
                                 borderSide: BorderSide(
                                     color: Colors.grey[400]
                                 ),
-
                               ),
                               border: OutlineInputBorder(
                                   borderSide: BorderSide(color: Colors.grey[400])
                               )
                           ),
-
                         ),
                         const SizedBox(height: 20,),
-
                         const Text(
                           'Email',
-
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w400,
                             color:Colors.black87,
                           ),
-
                         ),
                         const SizedBox(
                           height: 10,
                         ),
-
                         TextFormField(
                           keyboardType: TextInputType.emailAddress,
                           validator: (input){
@@ -183,7 +171,7 @@ class _SignupPageState extends State<SignupPage> {
                               return 'Email inválido!';
                             }
                           } ,
-                          onSaved: (input) => _email =input,
+                          onSaved: (input) => _email = input,
                           decoration: InputDecoration(
                               contentPadding: const EdgeInsets.symmetric(vertical: 0,
                                   horizontal: 10),
@@ -191,16 +179,13 @@ class _SignupPageState extends State<SignupPage> {
                                 borderSide: BorderSide(
                                     color: Colors.grey[400]
                                 ),
-
                               ),
                               border: OutlineInputBorder(
                                   borderSide: BorderSide(color: Colors.grey[400])
                               )
                           ),
-
                         ),
                         const SizedBox(height: 20,),
-
                         const Text(
                           'Password',
                           style: TextStyle(
@@ -208,11 +193,8 @@ class _SignupPageState extends State<SignupPage> {
                               fontWeight: FontWeight.w400,
                               color:Colors.black87
                           ),
-
                         ),
-
                         SizedBox(height: 10,),
-
                         TextFormField(
                           controller: passwordText,
                           obscureText: hidePassword,
@@ -233,17 +215,13 @@ class _SignupPageState extends State<SignupPage> {
                                 borderSide: BorderSide(
                                     color: Colors.grey[400]
                                 ),
-
                               ),
                               border: OutlineInputBorder(
                                   borderSide: BorderSide(color: Colors.grey[400])
                               )
                           ),
-
                         ),
-
                         const SizedBox(height: 20,),
-
                         const Text(
                           'Confirmar Password',
                           style: TextStyle(
@@ -251,14 +229,10 @@ class _SignupPageState extends State<SignupPage> {
                               fontWeight: FontWeight.w400,
                               color:Colors.black87
                           ),
-
                         ),
-
                         const SizedBox(height: 10,),
-
                         TextFormField(
                           obscureText: hideConfirmPassword,
-
                           validator: (input){
                             if(input.length<6){
                               return 'A password deve ter no minimo 6 caracteres.';
@@ -279,18 +253,15 @@ class _SignupPageState extends State<SignupPage> {
                                 borderSide: BorderSide(
                                     color: Colors.grey[400]
                                 ),
-
                               ),
                               border: OutlineInputBorder(
                                   borderSide: BorderSide(color: Colors.grey[400])
                               )
                           ),
-
                         ),
                       ],
                     ),
                   ),
-
                 ],
               ),
               Container(
@@ -302,15 +273,12 @@ class _SignupPageState extends State<SignupPage> {
                       top: BorderSide(color: Colors.black),
                       left: BorderSide(color: Colors.black),
                       right: BorderSide(color: Colors.black),
-
                     )
-
                 ),
                 child: MaterialButton(
                   minWidth: double.infinity,
                   height: 60,
                   onPressed: () {
-
                     _createuser();
                     //Navigator.of(context).pushReplacementNamed('/home');
                   },
@@ -318,19 +286,15 @@ class _SignupPageState extends State<SignupPage> {
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50),
-
                   ),
                   child: const Text(
                     "Criar conta", style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 18,
                     color: Colors.white,
-
                   ),
                   ),
-
                 ),
-
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -347,25 +311,17 @@ class _SignupPageState extends State<SignupPage> {
                           Text("Já tem uma conta?"),
                           Text(" Iniciar sessão", style:TextStyle(
                               fontWeight: FontWeight.w600,
-                              fontSize: 18
-                          ),
+                              fontSize: 18),
                           )
-
                         ],
                       )
                   ),
                 ],
               ),
-
             ],
-
           ),
-
-
         ),
-
       ),
-
     );
   }
 }

@@ -1,20 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../services/firestoreReviewsBook.dart';
 
-
-
-class ReviewsAdmin extends StatefulWidget {
-  const ReviewsAdmin({Key key}) : super(key: key);
+class RemoverAudiobooksAdmin extends StatefulWidget {
+  const RemoverAudiobooksAdmin({Key key}) : super(key: key);
 
   @override
-  _ReviewsAdminState createState() => _ReviewsAdminState();
+  _RemoverAudiobooksAdminState createState() => _RemoverAudiobooksAdminState();
 }
 
-class _ReviewsAdminState extends State<ReviewsAdmin> {
+class _RemoverAudiobooksAdminState extends State<RemoverAudiobooksAdmin> {
 
-  var idReview;
-  Future<void> _showDialog(idReview) async {
+  var idAudiobook;
+  Future<void> _showDialog(idAudiobook) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -24,7 +21,7 @@ class _ReviewsAdminState extends State<ReviewsAdmin> {
           content: SingleChildScrollView(
             child: ListBody(
               children: const <Widget>[
-                Text('A Review será apagada permanentemente do sistema.'),
+                Text('O livro será apagado permanentemente do sistema.'),
               ],
             ),
           ),
@@ -32,10 +29,8 @@ class _ReviewsAdminState extends State<ReviewsAdmin> {
             TextButton(
               child: Center(child: Text('Sim')),
               onPressed: () {
-                FirestoreReviewDelete(idReview);
+                _delete(idAudiobook);
                 Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('A review foi apagada com sucesso')));
               },
             ),
             TextButton(
@@ -50,27 +45,37 @@ class _ReviewsAdminState extends State<ReviewsAdmin> {
     );
   }
 
+  Future<void> _delete(String idAudiobook) async{
+    await FirebaseFirestore.instance.collection("Audiobooks").doc(idAudiobook).delete();
+
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('O audiobook foi apagado com suscesso')));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: //Livros
+      Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(height: 25,),
-          Flexible(
-            child:  StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('Reviews').snapshots(),
+
+          Container(
+            width:500,
+            height: 500,
+            child:  FutureBuilder<QuerySnapshot>(
+              future: FirebaseFirestore.instance.collection("Audiobooks").get(),
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData) return Center(child:  Text('A carregar Reviews...'));
+                if (!snapshot.hasData) return Center(child:  Text('A carregar audiobooks...'));
+                final List<DocumentSnapshot> arrData = snapshot.data.docs;
                 return ListView(
-                  children: snapshot.data.docs.map((DocumentSnapshot document) {
+                  children: arrData.map((data) {
                     return  SafeArea(
                       child:  Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          height: MediaQuery.of(context).size.height/6.5,
-                          width: MediaQuery.of(context).size.width,
+                        child: Card(
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -81,10 +86,10 @@ class _ReviewsAdminState extends State<ReviewsAdmin> {
                                   width: 60,
                                   height: 60,
                                   decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
+                                      shape: BoxShape.rectangle,
                                       image: DecorationImage(
                                         fit: BoxFit.cover,
-                                        image: NetworkImage("${document['Foto']}"),
+                                        image: NetworkImage("${data['Capa']}"),
                                       )
                                   ),
                                 ),
@@ -93,19 +98,19 @@ class _ReviewsAdminState extends State<ReviewsAdmin> {
                                 child: Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         children: [
-                                          Text(document['Nome'], style:
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 7),
+                                            child: Text(data['Titulo'], style:
                                           TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),
-                                          ),
+                                          ),),
                                         ],
                                       ),
                                       SizedBox(height: 5,),
-                                      Text(document['Conteudo'], style: TextStyle(fontSize: 15, color: Colors.black),),
+                                      Text(data['Autor'], style: TextStyle(fontSize: 15, color: Colors.black),),
                                     ],
                                   ),
                                 ),
@@ -115,8 +120,8 @@ class _ReviewsAdminState extends State<ReviewsAdmin> {
                                   color: Colors.grey,
                                   size: 35),
                                 onPressed: () {
-                                _showDialog(document.id) ;
-                              },
+                                  _showDialog(data.id) ;
+                                },
                               ),
                             ],
                           ),

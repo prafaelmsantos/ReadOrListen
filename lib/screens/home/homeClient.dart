@@ -2,11 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:read_or_listen/screens/books/homeBooks.dart';
-
 import 'package:read_or_listen/screens/profile/profile.dart';
-
+import 'package:read_or_listen/screens/search/search.dart';
 import 'package:read_or_listen/services/firestoreUsers.dart';
-
+import 'package:read_or_listen/screens/biblioteca/homeBiblioteca.dart';
+import 'package:read_or_listen/screens/audiobooks/homeAudiobooks.dart';
 
 class HomePageClient extends StatefulWidget {
   const HomePageClient({Key key}) : super(key: key);
@@ -16,7 +16,6 @@ class HomePageClient extends StatefulWidget {
 }
 
 class _HomePageClientState extends State<HomePageClient> {
-
   final String _userName = FirebaseAuth.instance.currentUser.displayName;
   String uid = FirebaseAuth.instance.currentUser.uid;
   CollectionReference utilizadores = FirebaseFirestore.instance.collection('Utilizadores');
@@ -38,7 +37,6 @@ class _HomePageClientState extends State<HomePageClient> {
               },
               child:const Text('Cancelar')
           ),
-
         ],
       ),
     );
@@ -47,64 +45,41 @@ class _HomePageClientState extends State<HomePageClient> {
 
   Future<void> _logoutuser() async {
 
-    //Firestore offline
+    //Firestore utilizador offline
     OfflineUser();
 
     //Sair FirebaseAuth
     await FirebaseAuth.instance.signOut();
-
-    //Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext contex) => Welcome()));
-    //Navigator.popUntil(context, ModalRoute.withName('/welcome'));
     Navigator.pushNamedAndRemoveUntil(context, "/welcome", (Route<dynamic> route) => false);
-
-
   }
 
   int _selectedIndex = 0;
-
   static const List<Widget> _widgetOptions = <Widget>[
-
     //Pagina Livros
     HomeBooksPage(),
-
-    Text(
-      'Audiobooks Page',
-      //style: optionStyle,
-    ),
-    Text(
-      'Procurar Page',
-      //style: optionStyle,
-    ),
-    Text(
-      'Biblioteca Page',
-      //style: optionStyle,
-    ),
-
+    //Pagina Audiobooks
+    HomeAudiobooksPage(),
+    //Pagina Pesquisa
+    SearchPage(),
+    //Pagina Biblioteca
+    HomeBibliotecaPage(),
   ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       drawer: Drawer(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-
             UserAccountsDrawerHeader(
               decoration: const BoxDecoration(
-                color: Colors.red,
+                color: Colors.black87,
               ),
               currentAccountPicture:FutureBuilder<DocumentSnapshot>(
                 future: utilizadores.doc(uid).get(),
                 builder:
                     (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-
                   if (snapshot.hasError) {
                     return const Text("Something went wrong");
                   }
@@ -124,9 +99,7 @@ class _HomePageClientState extends State<HomePageClient> {
                             decoration: BoxDecoration(
                                 border: Border.all(
                                   width: 1,
-                                  //color: Theme.of(context).backgroundColor
                                 ),
-
                                 shape: BoxShape.circle,
                                 image: DecorationImage(
                                   fit: BoxFit.cover,
@@ -138,7 +111,6 @@ class _HomePageClientState extends State<HomePageClient> {
                       ),
                     );
                   }
-
                   return const Text("A carregar...");
                 },
               ),
@@ -146,12 +118,9 @@ class _HomePageClientState extends State<HomePageClient> {
                 'Bem-vindo '+_userName,style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w500,
-                color: Colors.black,
-              ),
-
+                color: Colors.white,),
               ),
             ),
-
             ListTile(
               leading: const Icon(Icons.home),
               title: const Text('Inicio',style: TextStyle(
@@ -180,7 +149,6 @@ class _HomePageClientState extends State<HomePageClient> {
               },
               trailing: const Icon(Icons.arrow_forward_ios_outlined),
             ),
-
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Sair',style: TextStyle(
@@ -198,14 +166,18 @@ class _HomePageClientState extends State<HomePageClient> {
         ),
       ),
       appBar: AppBar(
-        backgroundColor: Colors.red[900],
+        backgroundColor: Colors.black87,
         title: const Text('Read Or Listen'),
       ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
-
+        currentIndex: _selectedIndex, //muda o icon principal da navbar
+        type: BottomNavigationBarType.fixed, //Não muda, fixa
+        unselectedItemColor: Colors.grey,
+        selectedItemColor: Colors.black,
+        iconSize: 30,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.menu_book_sharp),
@@ -213,7 +185,7 @@ class _HomePageClientState extends State<HomePageClient> {
             backgroundColor: Colors.grey,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.audiotrack_outlined),
+            icon: Icon(Icons.headset),
             label: 'Audiobooks',
           ),
           BottomNavigationBarItem(
@@ -224,19 +196,13 @@ class _HomePageClientState extends State<HomePageClient> {
             icon: Icon(Icons.account_balance),
             label: 'Biblioteca',
           ),
-
         ],
-        currentIndex: _selectedIndex,
-        unselectedItemColor: Colors.white54 ,
-        selectedItemColor: Colors.black,
-        selectedFontSize: 20.0,
-        unselectedFontSize: 18.0,
-        onTap: _onItemTapped,
-
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index; //muda de pagina
+            });
+          }
       ),
-
-
     );
-
   }
 }
